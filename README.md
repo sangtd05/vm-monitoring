@@ -31,6 +31,7 @@ docker compose up -d
 
 ### 3. Truy cập các dịch vụ
 
+#### Từ máy local:
 - **Grafana Dashboard**: http://localhost:3000
   - Username: `admin`
   - Password: `admin123`
@@ -40,6 +41,42 @@ docker compose up -d
 - **Node Exporter**: http://localhost:9100
 
 - **cAdvisor**: http://localhost:8080
+
+#### Từ máy khác trong mạng:
+Thay `localhost` bằng IP của máy chủ:
+- **Grafana Dashboard**: http://[IP-MÁY-CHỦ]:3000
+- **Prometheus**: http://[IP-MÁY-CHỦ]:9090
+- **Node Exporter**: http://[IP-MÁY-CHỦ]:9100
+- **cAdvisor**: http://[IP-MÁY-CHỦ]:8080
+
+### 4. Cấu hình Firewall (nếu cần)
+
+Nếu không thể truy cập từ máy khác, cần cấu hình firewall:
+
+```bash
+# Cấu hình firewall tự động
+sudo ./setup-firewall.sh
+
+# Hoặc cấu hình thủ công với UFW
+sudo ufw allow 3000/tcp  # Grafana
+sudo ufw allow 9090/tcp  # Prometheus
+sudo ufw allow 9100/tcp  # Node Exporter
+sudo ufw allow 8080/tcp  # cAdvisor
+sudo ufw allow 9113/tcp  # Nginx Exporter
+```
+
+### 5. Kiểm tra kết nối
+
+```bash
+# Kiểm tra trạng thái truy cập
+./check-access.sh
+
+# Kiểm tra trạng thái containers
+docker compose ps
+
+# Kiểm tra logs
+docker compose logs
+```
 
 ## 📊 Dashboard
 
