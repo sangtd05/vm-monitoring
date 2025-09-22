@@ -12,13 +12,6 @@ Hệ thống monitoring VM hoàn chỉnh sử dụng Grafana, Prometheus và Bla
 - **Dashboard trực quan**: Giao diện Grafana dễ sử dụng
 - **External Access**: Truy cập từ máy khác trong mạng
 
-## 📋 Yêu cầu hệ thống
-
-- Docker và Docker Compose
-- ít nhất 2GB RAM
-- 10GB disk space
-- Ports: 3000, 8080, 9090, 9100, 9113, 9115
-
 ## 🛠️ Cài đặt
 
 ### 1. Clone repository
@@ -244,22 +237,6 @@ sudo ./vm-monitor.sh firewall
 netstat -tlnp | grep -E ':(3000|9090|9100|8080|9113|9115) '
 ```
 
-## 📈 Mở rộng
-
-### Thêm monitoring cho nhiều server
-1. Cài đặt Node Exporter trên các server khác
-2. Cập nhật `prometheus.yml` với targets mới
-3. Restart Prometheus: `./vm-monitor.sh restart`
-
-### Thêm monitoring cho database
-- MySQL Exporter
-- PostgreSQL Exporter  
-- MongoDB Exporter
-
-### Thêm monitoring cho web server
-- Apache Exporter
-- Nginx Exporter (đã có sẵn)
-
 ## 🔒 Bảo mật
 
 - Thay đổi password Grafana mặc định trong `.env`
@@ -267,15 +244,3 @@ netstat -tlnp | grep -E ':(3000|9090|9100|8080|9113|9115) '
 - Giới hạn truy cập từ IP cụ thể
 - Sử dụng firewall để bảo vệ ports
 - Cập nhật Docker images thường xuyên
-
-## 📞 Hỗ trợ
-
-Nếu gặp vấn đề, vui lòng:
-1. Chạy `./vm-monitor.sh status` để kiểm tra trạng thái
-2. Chạy `./vm-monitor.sh logs` để xem logs
-3. Chạy `./vm-monitor.sh access` để kiểm tra kết nối
-4. Tạo issue hoặc liên hệ qua email
-
----
-
-**Lưu ý**: Đây là hệ thống monitoring hoàn chỉnh với cả internal metrics và external health checks. Để sử dụng trong production, cần thêm các tính năng bảo mật và tối ưu hóa.
