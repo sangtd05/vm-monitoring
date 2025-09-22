@@ -60,3 +60,33 @@ groups:
         annotations:
           summary: "Network interface is down"
           description: "Network interface {{ $labels.device }} is down on {{ $labels.instance }}"
+
+      # Service Down (Blackbox)
+      - alert: ServiceDown
+        expr: probe_success{job="blackbox"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "Service {{ $labels.instance }} is down (blackbox probe failed)"
+
+      # High Response Time
+      - alert: HighResponseTime
+        expr: probe_duration_seconds{job="blackbox"} > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "Service {{ $labels.instance }} has high response time: {{ $value }}s"
+
+      # HTTP Error Status
+      - alert: HTTPErrorStatus
+        expr: probe_http_status_code{job="blackbox"} >= 400
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HTTP error status detected"
+          description: "Service {{ $labels.instance }} returned HTTP {{ $value }}"

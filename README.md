@@ -1,20 +1,23 @@
-# VM Monitoring System với Grafana + Prometheus
+# VM Monitoring System với Grafana + Prometheus + Blackbox
 
-Hệ thống monitoring VM sử dụng Grafana và Prometheus để theo dõi tài nguyên hệ thống, lưu lượng mạng, và các dịch vụ đang chạy.
+Hệ thống monitoring VM hoàn chỉnh sử dụng Grafana, Prometheus và Blackbox Exporter để theo dõi tài nguyên hệ thống, lưu lượng mạng, và uptime của các dịch vụ.
 
 ## 🚀 Tính năng
 
 - **Monitoring tài nguyên hệ thống**: CPU, Memory, Disk, Load Average
 - **Monitoring lưu lượng mạng**: Network traffic, bandwidth usage
-- **Monitoring dịch vụ**: Service status, uptime
-- **Alerting**: Cảnh báo khi có vấn đề xảy ra
+- **Service Uptime Monitoring**: Kiểm tra uptime và health của services
+- **Container Monitoring**: Theo dõi Docker containers
+- **Alerting**: Cảnh báo tự động khi có vấn đề xảy ra
 - **Dashboard trực quan**: Giao diện Grafana dễ sử dụng
+- **External Access**: Truy cập từ máy khác trong mạng
 
 ## 📋 Yêu cầu hệ thống
 
 - Docker và Docker Compose
 - ít nhất 2GB RAM
 - 10GB disk space
+- Ports: 3000, 8080, 9090, 9100, 9113, 9115
 
 ## 🛠️ Cài đặt
 
@@ -24,88 +27,70 @@ git clone <repository-url>
 cd monitoring-vm
 ```
 
-### 2. Khởi động hệ thống
+### 2. Cấu hình môi trường (tùy chọn)
 ```bash
-docker compose up -d
+# Copy file cấu hình mẫu
+cp env.example .env
+
+# Chỉnh sửa cấu hình nếu cần
+nano .env
 ```
 
-### 3. Truy cập các dịch vụ
+### 3. Khởi động hệ thống
+```bash
+# Cấp quyền thực thi cho script
+chmod +x vm-monitor.sh
 
-#### Từ máy local:
-- **Grafana Dashboard**: http://localhost:3000
-  - Username: `admin`
-  - Password: `admin123`
+# Khởi động hệ thống
+./vm-monitor.sh start
+```
 
+### 4. Cấu hình Firewall (nếu cần)
+```bash
+# Cấu hình firewall tự động
+sudo ./vm-monitor.sh firewall
+```
+
+## 📊 Truy cập các dịch vụ
+
+### Từ máy local:
+- **Grafana Dashboard**: http://localhost:3000 (admin/admin123)
 - **Prometheus**: http://localhost:9090
-
 - **Node Exporter**: http://localhost:9100
-
 - **cAdvisor**: http://localhost:8080
+- **Nginx Exporter**: http://localhost:9113
+- **Blackbox Exporter**: http://localhost:9115
 
-#### Từ máy khác trong mạng:
+### Từ máy khác trong mạng:
 Thay `localhost` bằng IP của máy chủ:
 - **Grafana Dashboard**: http://[IP-MÁY-CHỦ]:3000
 - **Prometheus**: http://[IP-MÁY-CHỦ]:9090
 - **Node Exporter**: http://[IP-MÁY-CHỦ]:9100
 - **cAdvisor**: http://[IP-MÁY-CHỦ]:8080
+- **Nginx Exporter**: http://[IP-MÁY-CHỦ]:9113
+- **Blackbox Exporter**: http://[IP-MÁY-CHỦ]:9115
 
-### 4. Cấu hình Firewall (nếu cần)
+## 📈 Dashboards
 
-Nếu không thể truy cập từ máy khác, cần cấu hình firewall:
+### VM Monitoring Dashboard
+- **CPU Usage**: Hiển thị % CPU đang được sử dụng
+- **Memory Usage**: Hiển thị % RAM đang được sử dụng
+- **Network Traffic**: Lưu lượng mạng RX/TX
+- **Disk I/O**: Tốc độ đọc/ghi disk
+- **System Load Average**: Load average 1m, 5m, 15m
 
-```bash
-# Cấu hình firewall tự động
-sudo ./setup-firewall.sh
-
-# Hoặc cấu hình thủ công với UFW
-sudo ufw allow 3000/tcp  # Grafana
-sudo ufw allow 9090/tcp  # Prometheus
-sudo ufw allow 9100/tcp  # Node Exporter
-sudo ufw allow 8080/tcp  # cAdvisor
-sudo ufw allow 9113/tcp  # Nginx Exporter
-```
-
-### 5. Kiểm tra kết nối
-
-```bash
-# Kiểm tra trạng thái truy cập
-./check-access.sh
-
-# Kiểm tra trạng thái containers
-docker compose ps
-
-# Kiểm tra logs
-docker compose logs
-```
-
-## 📊 Dashboard
-
-Sau khi đăng nhập vào Grafana, bạn sẽ thấy dashboard "VM Monitoring Dashboard" với các metrics:
-
-### CPU Usage
-- Hiển thị % CPU đang được sử dụng
-- Cảnh báo khi CPU > 80%
-
-### Memory Usage  
-- Hiển thị % RAM đang được sử dụng
-- Cảnh báo khi Memory > 85%
-
-### Network Traffic
-- Lưu lượng mạng RX/TX
-- Theo dõi bandwidth real-time
-
-### Disk I/O
-- Tốc độ đọc/ghi disk
-- Monitoring disk performance
-
-### System Load Average
-- Load average 1m, 5m, 15m
-- Cảnh báo khi load > 4
+### Blackbox Monitoring Dashboard
+- **Service Uptime Status**: Trạng thái UP/DOWN của services
+- **Response Time Tracking**: Thời gian phản hồi của services
+- **HTTP Status Monitoring**: HTTP status codes
+- **Uptime Percentage**: % uptime trong 5 phút và 1 giờ
+- **HTTP Duration Breakdown**: Phân tích chi tiết thời gian request
 
 ## 🔔 Alerting
 
 Hệ thống có các alert rules được cấu hình sẵn:
 
+### System Alerts
 - **High CPU Usage**: CPU > 80% trong 5 phút
 - **High Memory Usage**: Memory > 85% trong 5 phút  
 - **High Disk Usage**: Disk > 90% trong 5 phút
@@ -113,31 +98,85 @@ Hệ thống có các alert rules được cấu hình sẵn:
 - **Service Down**: Service không hoạt động
 - **Network Interface Down**: Network interface bị down
 
+### Blackbox Alerts
+- **Service Down (Blackbox)**: Service down từ góc độ external
+- **High Response Time**: Response time > 5 giây
+- **HTTP Error Status**: HTTP status code lỗi (4xx, 5xx)
+
 ## 🐳 Các container
 
 - **prometheus**: Thu thập và lưu trữ metrics
 - **grafana**: Dashboard và visualization
 - **node-exporter**: Thu thập system metrics
 - **cadvisor**: Thu thập container metrics
-- **nginx-exporter**: Thu thập nginx metrics (nếu có)
+- **nginx-exporter**: Thu thập nginx metrics
+- **blackbox-exporter**: Kiểm tra uptime và health của services
+
+## 🛠️ Quản lý hệ thống
+
+Sử dụng script `vm-monitor.sh` để quản lý hệ thống:
+
+```bash
+# Khởi động hệ thống
+./vm-monitor.sh start
+
+# Dừng hệ thống
+./vm-monitor.sh stop
+
+# Khởi động lại hệ thống
+./vm-monitor.sh restart
+
+# Kiểm tra trạng thái
+./vm-monitor.sh status
+
+# Xem logs
+./vm-monitor.sh logs
+
+# Xem logs của service cụ thể
+./vm-monitor.sh logs grafana
+
+# Cập nhật hệ thống
+./vm-monitor.sh update
+
+# Backup cấu hình
+./vm-monitor.sh backup
+
+# Cấu hình firewall
+sudo ./vm-monitor.sh firewall
+
+# Kiểm tra kết nối
+./vm-monitor.sh access
+
+# Hiển thị thông tin truy cập
+./vm-monitor.sh info
+
+# Hiển thị trợ giúp
+./vm-monitor.sh help
+```
 
 ## 📁 Cấu trúc thư mục
 
 ```
 monitoring-vm/
-├── docker-compose.yml          # Docker Compose configuration
+├── vm-monitor.sh                    # Script quản lý chính
+├── docker-compose.yml               # Docker Compose configuration
+├── env.example                      # File cấu hình môi trường mẫu
+├── .gitignore                       # Git ignore rules
 ├── prometheus/
-│   ├── prometheus.yml         # Prometheus config
+│   ├── prometheus.yml              # Prometheus config
 │   └── rules/
-│       └── vm-alerts.yml      # Alert rules
+│       └── vm-alerts.yml           # Alert rules
+├── blackbox/
+│   └── blackbox.yml                # Blackbox exporter config
 ├── grafana/
 │   ├── provisioning/
 │   │   ├── datasources/
-│   │   │   └── prometheus.yml # Prometheus datasource
+│   │   │   └── prometheus.yml      # Prometheus datasource
 │   │   └── dashboards/
-│   │       └── dashboards.yml # Dashboard config
+│   │       └── dashboards.yml      # Dashboard config
 │   └── dashboards/
-│       └── vm-monitoring.json # Main dashboard
+│       ├── vm-monitoring.json      # Main VM dashboard
+│       └── blackbox-monitoring.json # Blackbox monitoring dashboard
 └── README.md
 ```
 
@@ -145,7 +184,7 @@ monitoring-vm/
 
 ### Thêm metrics mới
 1. Chỉnh sửa `prometheus/prometheus.yml` để thêm job mới
-2. Restart Prometheus: `docker compose restart prometheus`
+2. Restart Prometheus: `./vm-monitor.sh restart`
 
 ### Tùy chỉnh dashboard
 1. Đăng nhập Grafana
@@ -154,17 +193,25 @@ monitoring-vm/
 
 ### Thêm alert rules
 1. Chỉnh sửa `prometheus/rules/vm-alerts.yml`
-2. Restart Prometheus: `docker compose restart prometheus`
+2. Restart Prometheus: `./vm-monitor.sh restart`
+
+### Thêm services để monitor
+1. Chỉnh sửa `prometheus/prometheus.yml` để thêm targets
+2. Cập nhật `blackbox/blackbox.yml` nếu cần
+3. Restart hệ thống: `./vm-monitor.sh restart`
 
 ## 🚨 Troubleshooting
 
 ### Container không start
 ```bash
 # Kiểm tra logs
-docker compose logs
+./vm-monitor.sh logs
+
+# Kiểm tra trạng thái
+./vm-monitor.sh status
 
 # Restart tất cả services
-docker compose restart
+./vm-monitor.sh restart
 ```
 
 ### Không thấy metrics
@@ -179,10 +226,22 @@ curl http://localhost:9100/metrics
 ### Dashboard không load
 ```bash
 # Kiểm tra Grafana logs
-docker compose logs grafana
+./vm-monitor.sh logs grafana
 
 # Restart Grafana
-docker compose restart grafana
+./vm-monitor.sh restart
+```
+
+### Không thể truy cập từ máy khác
+```bash
+# Kiểm tra kết nối
+./vm-monitor.sh access
+
+# Cấu hình firewall
+sudo ./vm-monitor.sh firewall
+
+# Kiểm tra ports
+netstat -tlnp | grep -E ':(3000|9090|9100|8080|9113|9115) '
 ```
 
 ## 📈 Mở rộng
@@ -190,7 +249,7 @@ docker compose restart grafana
 ### Thêm monitoring cho nhiều server
 1. Cài đặt Node Exporter trên các server khác
 2. Cập nhật `prometheus.yml` với targets mới
-3. Restart Prometheus
+3. Restart Prometheus: `./vm-monitor.sh restart`
 
 ### Thêm monitoring cho database
 - MySQL Exporter
@@ -203,15 +262,20 @@ docker compose restart grafana
 
 ## 🔒 Bảo mật
 
-- Thay đổi password Grafana mặc định
+- Thay đổi password Grafana mặc định trong `.env`
 - Sử dụng reverse proxy (nginx) với SSL
 - Giới hạn truy cập từ IP cụ thể
 - Sử dụng firewall để bảo vệ ports
+- Cập nhật Docker images thường xuyên
 
 ## 📞 Hỗ trợ
 
-Nếu gặp vấn đề, vui lòng tạo issue hoặc liên hệ qua email.
+Nếu gặp vấn đề, vui lòng:
+1. Chạy `./vm-monitor.sh status` để kiểm tra trạng thái
+2. Chạy `./vm-monitor.sh logs` để xem logs
+3. Chạy `./vm-monitor.sh access` để kiểm tra kết nối
+4. Tạo issue hoặc liên hệ qua email
 
 ---
 
-**Lưu ý**: Đây là hệ thống monitoring cơ bản. Để sử dụng trong production, cần thêm các tính năng bảo mật và tối ưu hóa.
+**Lưu ý**: Đây là hệ thống monitoring hoàn chỉnh với cả internal metrics và external health checks. Để sử dụng trong production, cần thêm các tính năng bảo mật và tối ưu hóa.

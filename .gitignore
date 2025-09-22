@@ -9,6 +9,7 @@ backup_*/
 *.log
 
 # Environment files
+.env
 .env.local
 .env.production
 
@@ -30,3 +31,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Docker override files
+docker-compose.override.yml

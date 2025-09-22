@@ -45,6 +45,8 @@ scrape_configs:
         - http://prometheus:9090
         - http://grafana:3000
         - http://node-exporter:9100
+        - http://cadvisor:8080
+        - http://nginx-exporter:9113
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -52,3 +54,6 @@ scrape_configs:
         target_label: instance
       - target_label: __address__
         replacement: blackbox-exporter:9115
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
