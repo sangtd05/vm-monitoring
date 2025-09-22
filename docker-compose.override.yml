@@ -1,8 +1,6 @@
 # Docker Compose Override File
 # Use this file to customize the default configuration
 
-version: '3.8'
-
 services:
   grafana:
     environment:

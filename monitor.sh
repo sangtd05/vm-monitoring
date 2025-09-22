@@ -52,13 +52,13 @@ start_monitoring() {
     mkdir -p grafana/dashboards
     
     # Start services
-    docker-compose up -d
+    docker compose up -d
     
     print_status "Waiting for services to start..."
     sleep 10
     
     # Check service status
-    if docker-compose ps | grep -q "Up"; then
+    if docker compose ps | grep -q "Up"; then
         print_status "✅ Monitoring system started successfully!"
         echo ""
         print_status "Access URLs:"
@@ -70,7 +70,7 @@ start_monitoring() {
         print_status "Use './monitor.sh status' to check service status"
     else
         print_error "Failed to start monitoring system"
-        docker-compose logs
+        docker compose logs
         exit 1
     fi
 }
@@ -80,7 +80,7 @@ stop_monitoring() {
     print_header
     print_status "Stopping VM Monitoring System..."
     
-    docker-compose down
+    docker compose down
     
     print_status "✅ Monitoring system stopped successfully!"
 }
@@ -90,7 +90,7 @@ restart_monitoring() {
     print_header
     print_status "Restarting VM Monitoring System..."
     
-    docker-compose restart
+    docker compose restart
     
     print_status "✅ Monitoring system restarted successfully!"
 }
@@ -101,7 +101,7 @@ show_status() {
     print_status "Service Status:"
     echo ""
     
-    docker-compose ps
+    docker compose ps
     
     echo ""
     print_status "Service Health Check:"
@@ -141,7 +141,7 @@ show_logs() {
     print_status "Showing logs for all services..."
     echo ""
     
-    docker-compose logs -f
+    docker compose logs -f
 }
 
 # Function to show specific service logs
@@ -151,7 +151,7 @@ show_service_logs() {
     print_status "Showing logs for $service..."
     echo ""
     
-    docker-compose logs -f $service
+    docker compose logs -f $service
 }
 
 # Function to update system
@@ -159,8 +159,8 @@ update_system() {
     print_header
     print_status "Updating monitoring system..."
     
-    docker-compose pull
-    docker-compose up -d
+    docker compose pull
+    docker compose up -d
     
     print_status "✅ Monitoring system updated successfully!"
 }

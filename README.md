@@ -26,7 +26,7 @@ cd monitoring-vm
 
 ### 2. Khởi động hệ thống
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 3. Truy cập các dịch vụ
@@ -108,7 +108,7 @@ monitoring-vm/
 
 ### Thêm metrics mới
 1. Chỉnh sửa `prometheus/prometheus.yml` để thêm job mới
-2. Restart Prometheus: `docker-compose restart prometheus`
+2. Restart Prometheus: `docker compose restart prometheus`
 
 ### Tùy chỉnh dashboard
 1. Đăng nhập Grafana
@@ -117,17 +117,17 @@ monitoring-vm/
 
 ### Thêm alert rules
 1. Chỉnh sửa `prometheus/rules/vm-alerts.yml`
-2. Restart Prometheus: `docker-compose restart prometheus`
+2. Restart Prometheus: `docker compose restart prometheus`
 
 ## 🚨 Troubleshooting
 
 ### Container không start
 ```bash
 # Kiểm tra logs
-docker-compose logs
+docker compose logs
 
 # Restart tất cả services
-docker-compose restart
+docker compose restart
 ```
 
 ### Không thấy metrics
@@ -142,10 +142,10 @@ curl http://localhost:9100/metrics
 ### Dashboard không load
 ```bash
 # Kiểm tra Grafana logs
-docker-compose logs grafana
+docker compose logs grafana
 
 # Restart Grafana
-docker-compose restart grafana
+docker compose restart grafana
 ```
 
 ## 📈 Mở rộng
