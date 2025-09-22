@@ -90,3 +90,43 @@ groups:
         annotations:
           summary: "HTTP error status detected"
           description: "Service {{ $labels.instance }} returned HTTP {{ $value }}"
+
+      # Container High CPU Usage
+      - alert: ContainerHighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container high CPU usage detected"
+          description: "Container {{ $labels.name }} CPU usage is above 80% for more than 5 minutes"
+
+      # Container High Memory Usage
+      - alert: ContainerHighMemoryUsage
+        expr: container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""} * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container high memory usage detected"
+          description: "Container {{ $labels.name }} memory usage is above 85% for more than 5 minutes"
+
+      # Nginx High Error Rate
+      - alert: NginxHighErrorRate
+        expr: rate(nginx_http_requests_total{status=~"4..|5.."}[5m]) / rate(nginx_http_requests_total[5m]) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Nginx high error rate detected"
+          description: "Nginx error rate is above 5% for more than 5 minutes"
+
+      # Nginx High Response Time
+      - alert: NginxHighResponseTime
+        expr: nginx_http_request_duration_seconds{quantile="0.95"} > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Nginx high response time detected"
+          description: "Nginx 95th percentile response time is above 1 second for more than 5 minutes"
